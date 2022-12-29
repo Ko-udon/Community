@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>커뮤니티 메인 홈페이지</title>
+  <style>
+    #theme{
+      text-align: center;
+      position: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="theme">
+  <h1>메인 페이지</h1>
+  <p> 반갑습니다! </p>
+</div>
+
+  <div th:replace="/fragments/layout.html :: fragment-client-menu"></div>
+
+</body>
+</html>
