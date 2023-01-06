@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
+public class User implements UserCode {
 
-public class User implements UserCode{
   @Id
   private String userId;
 

@@ -18,39 +18,37 @@ public class UserController {
 
   //회원가입 페이지 불러오기
   @GetMapping("/user/register")
-  public String register(){
+  public String register() {
     return "client/register";
   }
 
   //회원가입 정보 받아오기 POST
   @PostMapping("/user/register")
   public String registerSubmit(Model model,
-      UserInput parameter){
+      UserInput parameter) {
     //System.out.println(parameter.toString());
 
-    boolean result=userService.register(parameter);
-    model.addAttribute("result",result);
+    boolean result = userService.register(parameter);
+    model.addAttribute("result", result);
 
     return "client/register_complete";
   }
 
   @GetMapping("/member/email-auth")
-  public String emailAuth(Model model,HttpServletRequest request){
-    String uuid=request.getParameter("id");
+  public String emailAuth(Model model, HttpServletRequest request) {
+    String uuid = request.getParameter("id");
     //System.out.println(uuid);
 
-    boolean result=userService.emailAuth(uuid);
-    model.addAttribute("result",result);
+    boolean result = userService.emailAuth(uuid);
+    model.addAttribute("result", result);
 
     return "client/email-auth";
   }
 
 
-
-
   //로그인 페이지 불러오기
   @RequestMapping("/user/login")
-  public String login(){
+  public String login() {
     return "client/login";
   }
 

@@ -13,9 +13,5 @@ public class UserInput {
   private String password;
   private String phone;
   private String nickName;
-
-  private String newPassword; //새로운 비밀번호 설정 시
-
-
-
+  private String newPassword;
 }

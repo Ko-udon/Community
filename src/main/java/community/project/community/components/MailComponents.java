@@ -12,27 +12,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 
 public class MailComponents {
+
   //dlfmafjzhzihocih
   private final JavaMailSender javaMailSender;
 
-  public boolean sendMail(String mail,String subject,String text){
-    boolean result=false;
+  public boolean sendMail(String mail, String subject, String text) {
+    boolean result = false;
 
-    MimeMessagePreparator msg=new MimeMessagePreparator() {
+    MimeMessagePreparator msg = new MimeMessagePreparator() {
       @Override
       public void prepare(MimeMessage mimeMessage) throws Exception {
-        MimeMessageHelper mimeMessageHelper=new MimeMessageHelper(mimeMessage, true,"UTF-8");
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
         mimeMessageHelper.setTo(mail);
         mimeMessageHelper.setSubject(subject);
-        mimeMessageHelper.setText(text,true);
+        mimeMessageHelper.setText(text, true);
 
       }
     };
-    try{
+    try {
       javaMailSender.send(msg);
-      result=true;
+      result = true;
 
-    }catch (Exception e){
+    } catch (Exception e) {
       System.out.println(e.getMessage());
     }
     return result;

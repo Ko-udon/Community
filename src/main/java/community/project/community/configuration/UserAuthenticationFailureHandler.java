@@ -11,16 +11,17 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 public class UserAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
   @Override
-  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException exception) throws IOException, ServletException {
 
-    String msg="로그인에 실패하였습니다.";
-    if(exception instanceof InternalAuthenticationServiceException){
-      msg=exception.getMessage();
+    String msg = "로그인에 실패하였습니다.";
+    if (exception instanceof InternalAuthenticationServiceException) {
+      msg = exception.getMessage();
     }
 
     setUseForward(true);
     setDefaultFailureUrl("/user/login?error=true");
-    request.setAttribute("errorMessage",msg);  //에러메세지 html로 전달
+    request.setAttribute("errorMessage", msg);  //에러메세지 html로 전달
 
     System.out.println("로그인에 실패하였습니다.");
 
