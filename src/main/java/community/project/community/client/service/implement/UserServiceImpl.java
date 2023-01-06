@@ -22,9 +22,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl {
 
-  private final UserRepository userRepository;
+  /*private final UserRepository userRepository;
   private final MailComponents mailComponents;
 
   @Override
@@ -113,5 +113,5 @@ public class UserServiceImpl implements UserService {
     return new org.springframework.security.core.userdetails.User(user.getUserId(),
         user.getPassword(), grantedAuthorities);
 
-  }
+  }*/
 }

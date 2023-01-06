@@ -2,6 +2,8 @@ package community.project.community.client.entity;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +19,9 @@ import lombok.NoArgsConstructor;
 public class User implements UserCode {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;  //회원 고유번호 부여
+
   private String userId;
 
   private String userName;
