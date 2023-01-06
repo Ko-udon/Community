@@ -23,7 +23,7 @@ public class UserAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
     setDefaultFailureUrl("/user/login?error=true");
     request.setAttribute("errorMessage", msg);  //에러메세지 html로 전달
 
-    System.out.println("로그인에 실패하였습니다.");
+    //System.out.println("로그인에 실패하였습니다.");
 
     super.onAuthenticationFailure(request, response, exception);
   }

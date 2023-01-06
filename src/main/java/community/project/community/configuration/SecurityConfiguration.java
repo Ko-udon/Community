@@ -57,7 +57,8 @@ public class SecurityConfiguration {
             , "/user/email-auth"
             , "/user/find-password"
             , "/user/reset/password"
-            , "/user/login"
+            , "/user/login",
+            "/**"
         )
         .permitAll();
 
@@ -71,7 +72,7 @@ public class SecurityConfiguration {
         .failureUrl("/login?error=true")
         .loginPage("/user/login")
         .successHandler(successHandler())
-        .failureHandler(getFailureHandler())
+        //.failureHandler(getFailureHandler())
         .usernameParameter("username")
         .passwordParameter("password");
 

@@ -39,4 +39,5 @@ public class User implements UserCode {
   private LocalDateTime updDt;
 
   private String userStatus;  //이용자의 상태, 정지 이용자 or 사용자
+  private String userRole;
 }

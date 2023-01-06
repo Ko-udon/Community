@@ -1,6 +1,7 @@
 package community.project.community.client.service.implement;
 
 import community.project.community.client.entity.User;
+import community.project.community.client.enums.UserStatus;
 import community.project.community.client.exception.UserNotEmailAuthException;
 import community.project.community.client.model.UserInput;
 import community.project.community.client.repository.UserRepository;
@@ -22,12 +23,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService{
 
-  /*private final UserRepository userRepository;
+  private final UserRepository userRepository;
   private final MailComponents mailComponents;
 
-  @Override
+  /*@Override
   public boolean register(UserInput parameter) {
     Optional<User> optionalUser = userRepository.findById(parameter.getUserId());
 
@@ -60,7 +61,7 @@ public class UserServiceImpl {
     mailComponents.sendMail(email, subject, text);
 
     return true;
-  }
+  }*/
 
   @Override
   public boolean emailAuth(String uuid) {
@@ -78,13 +79,13 @@ public class UserServiceImpl {
     //member.setUserStatus(Member.MEMBER_STATUS_ING);
     user.setEmailAuthYn(true);
     user.setEmailAuthDt(LocalDateTime.now());
-    user.setUserStatus(User.MEMBER_STATUS_ING);
+    user.setUserStatus(UserStatus.ING.toString());
     userRepository.save(user);
 
     return true;
   }
 
-  //로그인 확인 ->DetailService
+  /*//로그인 확인 ->DetailService
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Optional<User> optionalUser = userRepository.findById(username);

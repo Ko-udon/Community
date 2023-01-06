@@ -12,6 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   int countByUserId(String userId); // 회원가입 확인용
 
+  Optional<User> findByUserId(String userId);
 
-
+  Optional<Object> findByIdAndPassword(long id, String password); //사용자 비밀번호 업데이트
 }
