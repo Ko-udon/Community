@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/Community
@@ -20,12 +24,19 @@ spring:
         smtp:
           starttls:
             enable: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 
 logging:
   level:
     root: info
 
+file:
+  upload:
+    location: D:/IntelliJ/JavaWorkspace/Community/src/main/java/community/project/community/Img
+uploadFoloder: upload
 #mybatis:
 #  mapper-locations: mybatis/**/*.xml
 #  configuration:

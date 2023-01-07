@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class User implements UserCode {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,6 +25,7 @@ public class User implements UserCode {
   private String userId;
 
   private String userName;
+  private String userNickName;
   private String phone;
   private String password;
   private LocalDateTime regDt;

@@ -4,6 +4,7 @@ import community.project.community.client.entity.User;
 import community.project.community.client.exception.UserNotFoundException;
 import community.project.community.client.model.UserResponse;
 import community.project.community.client.repository.UserRepository;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ public class AdminController {
   }
 
   //계정 확인
+  @ApiOperation(value = "사용자 확인", notes = "사용자 확인API 입니다. 유저 고유 ID를 입력해주세요.")
   @GetMapping("/api/user/{id}")
   public UserResponse getUser(@PathVariable Long id) {
     User user = userRepository.findById(id)

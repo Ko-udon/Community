@@ -33,7 +33,4 @@ public class UserInput {
 
 
   private String nickName;
-
-  private String newPassword;
-  private LocalDateTime regDate;
 }

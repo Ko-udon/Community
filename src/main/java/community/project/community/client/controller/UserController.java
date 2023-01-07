@@ -5,7 +5,6 @@ import community.project.community.client.enums.UserRole;
 import community.project.community.client.enums.UserStatus;
 import community.project.community.client.exception.AlreadyRegistEmail;
 import community.project.community.client.exception.EmailExistException;
-import community.project.community.client.exception.PasswordNotMatchException;
 import community.project.community.client.exception.UserLoginNotCorrectPasswordException;
 import community.project.community.client.exception.UserNotEmailAuthException;
 import community.project.community.client.exception.UserNotFoundException;
@@ -16,6 +15,9 @@ import community.project.community.client.model.UserInputPassword;
 import community.project.community.client.repository.UserRepository;
 import community.project.community.client.service.UserService;
 import community.project.community.components.MailComponents;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,19 +30,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @AllArgsConstructor
@@ -68,9 +70,12 @@ public class UserController {
   }
 
   //회원가입
+  @ApiOperation(value = "회원가입", notes = "회원가입API 입니다. 해당하는 입력값을 넣어주세요.")
   @PostMapping("/user/register")
-  public ResponseEntity<?> userRegister(@RequestBody @Valid UserInput userInput
-      , Errors error) {
+  public ResponseEntity<?> userRegister(
+      @ModelAttribute @Valid @ApiParam(value = "사용자 아이디와 비밀번호 : ") UserInput userInput
+      , @ApiIgnore Errors error) {
+
     List<ResponseError> responseErrorList = new ArrayList<>();
     if (error.hasErrors()) {
       error.getAllErrors().stream().forEach((e) -> {
@@ -85,11 +90,12 @@ public class UserController {
     }
 
     String encryptPassword = getEncryptPassword(userInput.getPassword());
-    String uuid= UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
     User user = User.builder()
         .userId(userInput.getUserId())
         .userName(userInput.getUserName())
+        .userNickName(userInput.getNickName())
         .phone(userInput.getPhone())
         .password(encryptPassword)
         .regDt(LocalDateTime.now())
@@ -103,28 +109,31 @@ public class UserController {
 
     //인증 이메일 전송
 
-    String email= userInput.getUserId();
-    String subject="00커뮤니티 사이트 가입을 축하드립니다.";
-    String text="<p> 00커뮤니티 사이트 가입을 축하드립니다. <p><p>아래 링크를 통해 인증하여 가입을 완료 하세요. </p>"
-        +"<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid + "'>가입 완료 </a></div>";
-    mailComponents.sendMail(email,subject,text);
+    String email = userInput.getUserId();
+    String subject = "00커뮤니티 사이트 가입을 축하드립니다.";
+    String text = "<p> 00커뮤니티 사이트 가입을 축하드립니다. <p><p>아래 링크를 통해 인증하여 가입을 완료 하세요. </p>"
+        + "<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid
+        + "'>가입 완료 </a></div>";
+    mailComponents.sendMail(email, subject, text);
 
     return ResponseEntity.ok().build();
   }
 
   //이메일 인증
+  @ApiIgnore
   @GetMapping("/member/email-auth")
-  public String emailAuth(HttpServletRequest request){
-    String uuid=request.getParameter("id");
+  public String emailAuth(HttpServletRequest request) {
+    String uuid = request.getParameter("id");
     userService.emailAuth(uuid);
 
     return "이메일 인증 완료";
   }
 
   //로그인
+  @ApiOperation(value = "로그인", notes = "로그인API 입니다. 아이디와 비밀번호를 입력하세요.")
   @PostMapping("/user/login")
-  public ResponseEntity<List<ResponseError>> userLogin(@RequestBody UserInputLogin userInputLogin
-      , Errors error) {
+  public ResponseEntity<List<ResponseError>> userLogin(@ModelAttribute UserInputLogin userInputLogin
+      , @ApiIgnore Errors error) {
     List<ResponseError> responseErrorList = new ArrayList<>();
     if (error.hasErrors()) {
       error.getAllErrors().stream().forEach((e) -> {
@@ -148,15 +157,16 @@ public class UserController {
     if (!passwordEncoder.matches(userInputLogin.getPassword(), user.get().getPassword())) {
       throw new UserLoginNotCorrectPasswordException("아이디와 비밀번호가 일치하지 않습니다.");
     }
-
+    log.info("로그인 성공");
     return ResponseEntity.ok().build();
   }
 
   //비밀번호 수정
+  @ApiOperation(value = "비밀번호 수정", notes = "비밀번호 수정 API 입니다. 해당하는 입력값을 넣어주세요.")
   @PatchMapping("/user/{id}/setPassword")
   public ResponseEntity<?> updateUserPassword(@PathVariable Long id,
-      @RequestBody UserInputPassword userInputPassword,
-      Errors errors) {
+      @ModelAttribute UserInputPassword userInputPassword
+      ,@ApiIgnore Errors errors) {
     List<ResponseError> responseErrorList = new ArrayList<>();
     if (errors.hasErrors()) {
       errors.getAllErrors().stream().forEach((e) -> {
@@ -165,7 +175,7 @@ public class UserController {
       return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
     }
     User user = userRepository.findById(id)
-        .orElseThrow(()->new UserNotFoundException("해당하는 계정이 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException("해당하는 계정이 없습니다."));
 
     //아이디와 비밀번호 확인
     if (!passwordEncoder.matches(userInputPassword.getPassword(), user.getPassword())) {
@@ -179,6 +189,7 @@ public class UserController {
 
 
   //회원탈퇴
+  @ApiOperation(value = "회원탈퇴", notes = "회원탈퇴API 입니다. 해당하는 입력값을 넣어주세요.")
   @PostMapping("/user/delete/{id}")
   public ResponseEntity<?> userDelete(@PathVariable Long id) {
     User user = userRepository.findById(id)
@@ -199,8 +210,5 @@ public class UserController {
 
     return ResponseEntity.ok().build();
   }
-
-
-
 
 }
