@@ -57,7 +57,8 @@ public class SecurityConfiguration {
             , "/user/email-auth"
             , "/user/find-password"
             , "/user/reset/password"
-            , "/user/login"
+            , "/user/login",
+            "/**"
         )
         .permitAll();
 
@@ -66,14 +67,14 @@ public class SecurityConfiguration {
         .hasAnyAuthority("ROLE_ADMIN")   //관리자 페이지 접근 권한 부여
         .anyRequest().authenticated();  //그 외 모든 요청은 인증 필요
 
-    http.formLogin()
+    /*http.formLogin()
         .defaultSuccessUrl("/")
         .failureUrl("/login?error=true")
         .loginPage("/user/login")
         .successHandler(successHandler())
-        .failureHandler(getFailureHandler())
+        //.failureHandler(getFailureHandler())
         .usernameParameter("username")
-        .passwordParameter("password");
+        .passwordParameter("password");*/
 
     http
         .logout()
