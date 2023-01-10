@@ -81,12 +81,14 @@ public class UserController {
       error.getAllErrors().stream().forEach((e) -> {
         responseErrorList.add(ResponseError.of((FieldError) e));
       });
-      return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest().body(responseErrorList);
     }
 
     //동일한 이메일 계정이 있다면 예외처리
     if (userRepository.countByUserId(userInput.getUserId()) > 0) {
-      throw new AlreadyRegistEmail("이미 가입된 이메일 계정입니다.");
+      //아래처럼 예외처리를 불러오는 방법이 맞는건지?,,,예외메세지를 api문서에서 보이게끔
+      // 하려고 합니다. 궁금합니다.
+      return ResponseEntity.badRequest().body(new AlreadyRegistEmail("이미가입된 이메일 계정입니다."));
     }
 
     String encryptPassword = getEncryptPassword(userInput.getPassword());
@@ -116,7 +118,8 @@ public class UserController {
         + "'>가입 완료 </a></div>";
     mailComponents.sendMail(email, subject, text);
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok()
+        .body("회원가입에 성공하였습니다. 회원 고유 번호는 (" + user.getUserId() + ") 입니다. 이메일을 통해 인증해주세요.");
   }
 
   //이메일 인증
@@ -132,33 +135,34 @@ public class UserController {
   //로그인
   @ApiOperation(value = "로그인", notes = "로그인API 입니다. 아이디와 비밀번호를 입력하세요.")
   @PostMapping("/user/login")
-  public ResponseEntity<List<ResponseError>> userLogin(@ModelAttribute UserInputLogin userInputLogin
+  public ResponseEntity<?> userLogin(@ModelAttribute UserInputLogin userInputLogin
       , @ApiIgnore Errors error) {
     List<ResponseError> responseErrorList = new ArrayList<>();
     if (error.hasErrors()) {
       error.getAllErrors().stream().forEach((e) -> {
         responseErrorList.add(ResponseError.of((FieldError) e));
       });
-      return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest().body(responseErrorList);
     }
 
     Optional<User> user = userRepository.findByUserId(userInputLogin.getUserId());
     //존재하는 계정인지 확인
     if (!user.isPresent()) {
-      throw new EmailExistException("존재하지 않는 계정입니다.");
+      return ResponseEntity.badRequest().body(new EmailExistException("존재하지 않는 계정입니다."));
     }
 
     //이메일 인증이 되어있는지 확인
     if (!user.get().isEmailAuthYn()) {
-      throw new UserNotEmailAuthException("이메일 인증을 먼저 해주세요.");
+      return ResponseEntity.badRequest().body(new UserNotEmailAuthException("먼저 이메일 인증을 해주세요."));
     }
 
     //아이디와 비밀번호 확인
     if (!passwordEncoder.matches(userInputLogin.getPassword(), user.get().getPassword())) {
-      throw new UserLoginNotCorrectPasswordException("아이디와 비밀번호가 일치하지 않습니다.");
+      return ResponseEntity.badRequest()
+          .body(new UserLoginNotCorrectPasswordException("아이디와 비밀번호가 일치하지 않습니다."));
     }
     log.info("로그인 성공");
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok().body("로그인에 성공하였습니다.");
   }
 
   //비밀번호 수정
@@ -166,25 +170,26 @@ public class UserController {
   @PatchMapping("/user/{id}/setPassword")
   public ResponseEntity<?> updateUserPassword(@PathVariable Long id,
       @ModelAttribute UserInputPassword userInputPassword
-      ,@ApiIgnore Errors errors) {
+      , @ApiIgnore Errors errors) {
     List<ResponseError> responseErrorList = new ArrayList<>();
     if (errors.hasErrors()) {
       errors.getAllErrors().stream().forEach((e) -> {
         responseErrorList.add(ResponseError.of((FieldError) e));
       });
-      return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest().body(responseErrorList);
     }
     User user = userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException("해당하는 계정이 없습니다."));
 
     //아이디와 비밀번호 확인
     if (!passwordEncoder.matches(userInputPassword.getPassword(), user.getPassword())) {
-      throw new UserLoginNotCorrectPasswordException("비밀번호가 일치하지 않습니다.");
+      return ResponseEntity.badRequest()
+          .body(new UserLoginNotCorrectPasswordException("아이디와 비밀번호가 일치하지 않습니다."));
     }
     user.setPassword(getEncryptPassword(userInputPassword.getNewPassword()));
     userRepository.save(user);
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok().body("비밀번호가 정상적으로 수정되었습니다.");
   }
 
 
@@ -202,13 +207,15 @@ public class UserController {
       userRepository.delete(user);
     } catch (DataIntegrityViolationException e) {
       String message = "제약조건에 문제가 발생하였습니다.";
-      return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest()
+          .body(message);
     } catch (Exception e) {
       String message = "회원 탈퇴 중 문제가 발생하였습니다.";
-      return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest()
+          .body(message);
     }
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok().body("회원 탈퇴가 정상적으로 진행되었습니다.");
   }
 
 }
