@@ -28,7 +28,7 @@ public class User {
   private String userNickName;
   private String phone;
   private String password;
-  private LocalDateTime regDt;
+  private LocalDateTime registerDate;
   private boolean adminYn;
 
   private boolean emailAuthYn;
@@ -37,7 +37,7 @@ public class User {
 
   private String resetPasswordKey;
   private LocalDateTime resetPasswordLimitDt;
-  private LocalDateTime updDt;
+  private LocalDateTime updateDate;
 
   private String userStatus;  //이용자의 상태, 정지 이용자 or 사용자
   private String userRole;

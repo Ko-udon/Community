@@ -17,7 +17,7 @@ public class BoardModifyInput {
   private long boardId;
 
   //작성자 정보
-  private long userId;
+  private String userId;
 
   //게시글 내용
   private String title;

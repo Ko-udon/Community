@@ -21,13 +21,12 @@ public class Board {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long boardId;
 
-  private long userId;
-  private String userEmail;
+  private String userId;
   private String userNickName;
   private String title;
   private String contents;
-  private LocalDateTime regDt;
-  private LocalDateTime updDt;
+  private LocalDateTime registerDate;
+  private LocalDateTime updateDate;
 
   private int likes;
   private int hates;

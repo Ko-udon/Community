@@ -19,7 +19,7 @@ public class BoardInput {
 
   //작성자 정보
   @NotBlank(message = "작성자 정보가 없습니다.")
-  private long userId;
+  private String  userId;
 
   //게시글 내용
   @NotBlank(message = "게시글 제목은 필수 항목입니다.")
