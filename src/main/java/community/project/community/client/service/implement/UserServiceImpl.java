@@ -1,32 +1,90 @@
 package community.project.community.client.service.implement;
 
 import community.project.community.client.entity.User;
+import community.project.community.client.enums.UserRole;
 import community.project.community.client.enums.UserStatus;
-import community.project.community.client.exception.UserNotEmailAuthException;
+import community.project.community.client.exception.AlreadyRegistEmail;
 import community.project.community.client.model.UserInput;
 import community.project.community.client.repository.UserRepository;
 import community.project.community.client.service.UserService;
 import community.project.community.components.MailComponents;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final MailComponents mailComponents;
+
+  private final PasswordEncoder passwordEncoder;
+
+  //사용자 비밀번호 암호화
+  public String getEncryptPassword(String password) {
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    return bCryptPasswordEncoder.encode(password);
+  }
+
+  //회원가입
+  @Override
+  public boolean register(UserInput userInput) {
+    String encryptPassword = getEncryptPassword(userInput.getPassword());
+    String uuid = UUID.randomUUID().toString();
+
+    User user = User.builder()
+        .userId(userInput.getUserId())
+        .userName(userInput.getUserName())
+        .userNickName(userInput.getNickName())
+        .phone(userInput.getPhone())
+        .password(encryptPassword)
+        .registerDate(LocalDateTime.now())
+        .adminYn(false)
+        .emailAuthYn(false)
+        .emailAuthKey(uuid)
+        .userStatus(UserStatus.REQ.toString())
+        .userRole(UserRole.USER.toString())
+        .build();
+    userRepository.save(user);
+
+    sendAuthEmail(userInput.getUserId(),uuid);
+
+    return true;
+  }
+
+  //동일한 이메일 체크
+  @Override
+  public boolean checkSameEmail(String userId) {
+    if (!userRepository.existsByUserId(userId)) {
+      throw new AlreadyRegistEmail("이미가입된 이메일 계정입니다.");
+    }
+    return true;
+  }
+
+  @Override
+  public void sendAuthEmail(String email, String uuid) {
+    String subject = "00커뮤니티 사이트 가입을 축하드립니다.";
+    String text = "<p> 00커뮤니티 사이트 가입을 축하드립니다. <p><p>아래 링크를 통해 인증하여 가입을 완료 하세요. </p>"
+        + "<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid
+        + "'>가입 완료 </a></div>";
+    mailComponents.sendMail(email, subject, text);
+  }
+
+  //로그인
+  @Override
+  public boolean loginCheckPassword(String userInputPassword, String password) {
+    if (!passwordEncoder.matches(userInputPassword, password)) {
+      return false;
+    }
+    return true;
+  }
+
 
   /*@Override
   public boolean register(UserInput parameter) {
@@ -63,6 +121,7 @@ public class UserServiceImpl implements UserService{
     return true;
   }*/
 
+
   @Override
   public boolean emailAuth(String uuid) {
     Optional<User> optionalUser = userRepository.findByEmailAuthKey(uuid);
@@ -84,35 +143,4 @@ public class UserServiceImpl implements UserService{
 
     return true;
   }
-
-  /*//로그인 확인 ->DetailService
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> optionalUser = userRepository.findById(username);
-
-    if (!optionalUser.isPresent()) {
-      throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
-    }
-    User user = optionalUser.get();
-
-    if (User.MEMBER_STATUS_REQ.equals(user.getUserStatus())) {
-      throw new UserNotEmailAuthException("이메일 활성화 이후에 로그인을 해주세요.");
-    }
-    if (User.MEMBER_STATUS_STOP.equals(user.getUserStatus())) {
-      throw new UserNotEmailAuthException("정지된 회원 입니다.");
-    }
-
-    userRepository.save(user);
-
-    List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-    grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));  //디폴트 롤
-
-    if (user.isAdminYn()) {
-      grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));  //관리자 롤
-    }
-
-    return new org.springframework.security.core.userdetails.User(user.getUserId(),
-        user.getPassword(), grantedAuthorities);
-
-  }*/
 }
