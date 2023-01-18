@@ -16,5 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<Object> findByIdAndPassword(long id, String password); //사용자 비밀번호 업데이트
 
+  Optional<User> findByUserNameAndPhone (String useName, String phone);
+
 
 }

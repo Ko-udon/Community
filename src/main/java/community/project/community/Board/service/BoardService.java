@@ -1,5 +1,7 @@
 package community.project.community.Board.service;
 
+import community.project.community.Board.entity.Board;
+import community.project.community.Board.model.BoardDeleteInput;
 import community.project.community.Board.model.BoardInput;
 import community.project.community.Board.model.BoardModifyInput;
 
@@ -9,8 +11,10 @@ public interface BoardService {
   String[] getNewSaveFile(String baseLocalPath, String baseUrlPath,
       String originalFilename);
 
-  boolean addBoard(BoardInput boardInput);
+  Board addBoard(BoardInput boardInput);
 
-  boolean modifyBoard(BoardModifyInput boardModifyInput);
+  Board modifyBoard(BoardModifyInput boardModifyInput);
+
+  boolean deleteBoard(BoardDeleteInput boardDeleteInput);
 
 }
