@@ -19,6 +19,8 @@ public class UserController {
   @ApiIgnore
   @GetMapping("/member/email-auth")
   public String emailAuth(HttpServletRequest request) {
+
+    //이메일 인증 화면을 페이지로 띄우기 위해 Controller로 정의
     String uuid = request.getParameter("id");
     boolean result = userService.emailAuth(uuid);
     return "client/email-auth";

@@ -122,10 +122,13 @@ public class BoardServiceImpl implements BoardService {
     return board;
   }
 
+  //게시글 삭제
   @Override
   public boolean deleteBoard(BoardDeleteInput boardDeleteInput) {
+
+    //삭제 시도 전, 게시글, 유저 정보 판단
     Board board = boardRepository.findById(boardDeleteInput.getBoardId())
-        .orElseThrow(() -> new BoardNotFoundException("해당하는 게시판이 존재하지 않습니다."));
+        .orElseThrow(() -> new BoardNotFoundException("해당하는 게시글이 존재하지 않습니다."));
 
     User user = userRepository.findByUserId(boardDeleteInput.getUserId())
             .orElseThrow(() -> new UserNotFoundException("유저 정보가 존재하지 않습니다."));

@@ -112,11 +112,14 @@ public class UserServiceImpl implements UserService {
     return true;
   }
 
+  //유저 아이디 찾기
   @Override
   public String findUserId(String userName, String phone) {
-    String sql = "";
+
+    //이름+연락처 조합으로 사용자 찾기
     Optional<User> user = userRepository.findByUserNameAndPhone(userName, phone);
     if (user.isEmpty()) {
+      //유저가 없는 경우
       return "";
     }
     return user.get().getUserId();
