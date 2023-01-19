@@ -7,10 +7,10 @@ import community.project.community.Board.model.BoardCommentInput;
 import community.project.community.Board.model.BoardDeleteInput;
 import community.project.community.Board.model.BoardInput;
 import community.project.community.Board.model.BoardModifyInput;
+import community.project.community.Board.repository.BoardCommentRepository;
 import community.project.community.Board.repository.BoardRepository;
 import community.project.community.Board.service.BoardCommentService;
 import community.project.community.Board.service.BoardService;
-import community.project.community.client.repository.UserRepository;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +37,8 @@ public class BoardRestController {
   private final BoardService boardService;
   private final BoardCommentService boardCommentService;
 
+  private final BoardCommentRepository boardCommentRepository;
+
 
   //특정 게시판 글 가져오기
   @ApiOperation(value = "특정 게시판 글 불러오기", notes = "게시판 고유ID를 입력해주세요.")
@@ -53,7 +55,7 @@ public class BoardRestController {
   @GetMapping("/board/list/latest/{size}")
   public Page<Board> boardList(@PathVariable int size) {
     Page<Board> boardList = boardRepository.findAll(PageRequest.of(0, size
-        , Direction.DESC, "regDt"));
+        , Direction.DESC, "registerDate"));
     return boardList;
   }
 
@@ -101,19 +103,33 @@ public class BoardRestController {
     return ResponseEntity.ok().body("게시글 수정을 완료하였습니다: " + board);
   }
 
-  //게시판 댓글 작성
+  //게시글에 댓글 작성
 
   @ApiOperation(value = "게시글 댓글 작성")
   @PostMapping("/board/write/comment")
-  public ResponseEntity addBoardComment(@ModelAttribute BoardCommentInput boardCommentInput) {
+  public ResponseEntity<?> addBoardComment(@ModelAttribute BoardCommentInput boardCommentInput) {
 
 
     //게시글 댓글 작성
-    BoardComment boardComment = boardCommentService.addComment(boardCommentInput.getBoardId(),boardCommentInput.getUserId(),
-        boardCommentInput.getComment());
+    BoardComment boardComment = boardCommentService.addComment(boardCommentInput.getBoardId()
+            ,boardCommentInput.getUserId(), boardCommentInput.getComment());
 
     return ResponseEntity.ok()
-        .body("댓글이 정상적으로 업로드 되었습니다."+boardComment);
+        .body("댓글이 정상적으로 업로드 되었습니다.");
   }
+
+  //게시글의 댓글 목록
+  @ApiOperation(value = "게시글 댓글 조회")
+  @GetMapping("/board/comment/list/{boardId}")
+  public ResponseEntity<?> commentList(@PathVariable long boardId){
+    Board board = boardRepository.findByBoardId(boardId)
+            .orElseThrow(()-> new BoardNotFoundException("해당 게시글이 존재하지 않습니다."));
+
+    List<BoardComment> boardCommentList = boardCommentRepository.findAllByBoard(board);
+
+    return ResponseEntity.ok().body(boardCommentList);
+
+  }
+
 
 }

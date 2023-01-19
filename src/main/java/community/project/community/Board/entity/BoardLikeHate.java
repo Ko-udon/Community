@@ -29,8 +29,7 @@ public class BoardLikeHate {
   @ManyToOne(fetch = FetchType.LAZY)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Board board;
+
 
 }
 

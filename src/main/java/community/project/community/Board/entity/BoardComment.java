@@ -1,18 +1,14 @@
 package community.project.community.Board.entity;
 
-import community.project.community.client.entity.User;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.bytebuddy.asm.Advice;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,11 +24,20 @@ public class BoardComment {
   @NotBlank
   private String comment;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private User user;
+  @NotBlank
+  private String userId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  private LocalDateTime registerDate;
+
+  private LocalDateTime updateDate;
+
+  @ManyToOne
+  @JoinColumn(name = "board_id")
   private Board board;
+
+
+
+
 
 }
 
