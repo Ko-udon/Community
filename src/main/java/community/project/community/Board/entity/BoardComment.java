@@ -35,10 +35,6 @@ public class BoardComment {
   @JoinColumn(name = "board_id")
   private Board board;
 
-
-
-
-
 }
 
 

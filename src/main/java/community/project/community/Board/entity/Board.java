@@ -1,7 +1,6 @@
 package community.project.community.Board.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
@@ -40,6 +39,13 @@ public class Board {
   @JsonIgnore
   @OneToMany(mappedBy = "board",fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
   private List<BoardComment> boardCommentList;
+
+  @ElementCollection
+  private List<String> likeList;
+
+  @ElementCollection
+  @CollectionTable(name = "hateList")
+  private List<String> hateList;
 
 
 }
