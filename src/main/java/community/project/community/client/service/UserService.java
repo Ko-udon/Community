@@ -8,7 +8,8 @@ public interface UserService {
   //회원가입
   boolean register(UserInput parameter);
 
-  boolean emailAuth(String uuid); //이메일 인증
+  //이메일 인증
+  boolean emailAuth(String uuid);
 
   //패스워드 암호화
   String getEncryptPassword(String password);
@@ -21,6 +22,9 @@ public interface UserService {
 
   //패스워드 확인
   boolean loginCheckPassword(String userInputPassword, String password);
+
+  //아이디 찾기
+  String findUserId(String userName, String phone);
 
 
 

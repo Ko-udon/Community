@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminRestController {
 
   private final UserRepository userRepository;
 

@@ -4,6 +4,7 @@ import community.project.community.client.entity.User;
 import community.project.community.client.enums.UserRole;
 import community.project.community.client.enums.UserStatus;
 import community.project.community.client.exception.AlreadyRegistEmail;
+import community.project.community.client.exception.UserNotFoundException;
 import community.project.community.client.model.UserInput;
 import community.project.community.client.repository.UserRepository;
 import community.project.community.client.service.UserService;
@@ -13,17 +14,18 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final MailComponents mailComponents;
-
   private final PasswordEncoder passwordEncoder;
 
   //사용자 비밀번호 암호화
@@ -53,7 +55,7 @@ public class UserServiceImpl implements UserService {
         .build();
     userRepository.save(user);
 
-    sendAuthEmail(userInput.getUserId(),uuid);
+    sendAuthEmail(userInput.getUserId(), uuid);
 
     return true;
   }
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
   //동일한 이메일 체크
   @Override
   public boolean checkSameEmail(String userId) {
-    if (!userRepository.existsByUserId(userId)) {
+    if (userRepository.existsByUserId(userId)) {
       throw new AlreadyRegistEmail("이미가입된 이메일 계정입니다.");
     }
     return true;
@@ -76,6 +78,31 @@ public class UserServiceImpl implements UserService {
     mailComponents.sendMail(email, subject, text);
   }
 
+  @Override
+  public boolean emailAuth(String uuid) {
+    Optional<User> optionalUser = userRepository.findByEmailAuthKey(uuid);
+
+    if (!optionalUser.isPresent()) {
+      log.info("이메일 인증에 실패하였습니다.");
+      return false;
+    }
+    User user = optionalUser.get();
+
+    if (user.isEmailAuthYn()) {
+      log.info(optionalUser.get().getUserId() + " 회원은 이미 계정이 활성화 되었습니다.");
+      return false; //이미 해당 계정이 활성화 되었으므로 재 활성화시 false
+    }
+
+    //member.setUserStatus(Member.MEMBER_STATUS_ING);
+    user.setEmailAuthYn(true);
+    user.setEmailAuthDt(LocalDateTime.now());
+    user.setUserStatus(UserStatus.ING.toString());
+    userRepository.save(user);
+    log.info("회원아이디: " + optionalUser.get().getUserId() + " 계정이 활성화 되었습니다.");
+
+    return true;
+  }
+
   //로그인
   @Override
   public boolean loginCheckPassword(String userInputPassword, String password) {
@@ -83,6 +110,19 @@ public class UserServiceImpl implements UserService {
       return false;
     }
     return true;
+  }
+
+  //유저 아이디 찾기
+  @Override
+  public String findUserId(String userName, String phone) {
+
+    //이름+연락처 조합으로 사용자 찾기
+    Optional<User> user = userRepository.findByUserNameAndPhone(userName, phone);
+    if (user.isEmpty()) {
+      //유저가 없는 경우
+      return "";
+    }
+    return user.get().getUserId();
   }
 
 
@@ -122,25 +162,4 @@ public class UserServiceImpl implements UserService {
   }*/
 
 
-  @Override
-  public boolean emailAuth(String uuid) {
-    Optional<User> optionalUser = userRepository.findByEmailAuthKey(uuid);
-
-    if (!optionalUser.isPresent()) {
-      return false;
-    }
-    User user = optionalUser.get();
-
-    if (user.isEmailAuthYn()) {
-      return false; //이미 해당 계정이 활성화 되었으므로 재 활성화시 false
-    }
-
-    //member.setUserStatus(Member.MEMBER_STATUS_ING);
-    user.setEmailAuthYn(true);
-    user.setEmailAuthDt(LocalDateTime.now());
-    user.setUserStatus(UserStatus.ING.toString());
-    userRepository.save(user);
-
-    return true;
-  }
 }

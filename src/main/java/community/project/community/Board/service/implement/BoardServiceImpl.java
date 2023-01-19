@@ -3,6 +3,7 @@ package community.project.community.Board.service.implement;
 import community.project.community.Board.entity.Board;
 import community.project.community.Board.exception.BoardModifyNotMatchUserException;
 import community.project.community.Board.exception.BoardNotFoundException;
+import community.project.community.Board.model.BoardDeleteInput;
 import community.project.community.Board.model.BoardInput;
 import community.project.community.Board.model.BoardModifyInput;
 import community.project.community.Board.repository.BoardRepository;
@@ -26,12 +27,13 @@ import org.springframework.util.FileCopyUtils;
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
+
   private final UserRepository userRepository;
 
   private final BoardRepository boardRepository;
 
   @Override
-  public boolean addBoard(BoardInput boardInput) {
+  public Board addBoard(BoardInput boardInput) {
 
     String saveFilename = "";
     String urlFilename = "";
@@ -69,18 +71,18 @@ public class BoardServiceImpl implements BoardService {
         .urlFilename(urlFilename)
         .build());
 
-    return true;
+    return board;
   }
 
 
   //게시글 수정
   @Override
-  public boolean modifyBoard(BoardModifyInput boardModifyInput) {
+  public Board modifyBoard(BoardModifyInput boardModifyInput) {
 
     Board board = boardRepository.findById(boardModifyInput.getBoardId())
         .orElseThrow(() -> new BoardNotFoundException("해당하는 게시판이 존재하지 않습니다."));
 
-    if (!(board.getUserId() == boardModifyInput.getUserId())) {
+    if (!(board.getUserId().equals(boardModifyInput.getUserId()))) {
       throw new BoardModifyNotMatchUserException("게시글 수정의 권한이 없습니다.");
     }
 
@@ -113,9 +115,33 @@ public class BoardServiceImpl implements BoardService {
       board.setUrlFilename(urlFilename);
     }
 
+    log.info("게시글" + board.getBoardId() + "글이 수정되었습니다.");
+
     boardRepository.save(board);
 
-    return false;
+    return board;
+  }
+
+  //게시글 삭제
+  @Override
+  public boolean deleteBoard(BoardDeleteInput boardDeleteInput) {
+
+    //삭제 시도 전, 게시글, 유저 정보 판단
+    Board board = boardRepository.findById(boardDeleteInput.getBoardId())
+        .orElseThrow(() -> new BoardNotFoundException("해당하는 게시글이 존재하지 않습니다."));
+
+    User user = userRepository.findByUserId(boardDeleteInput.getUserId())
+            .orElseThrow(() -> new UserNotFoundException("유저 정보가 존재하지 않습니다."));
+
+    //게시글을 작성한 유저와 삭제를 시도하는 유저가 다른 경우
+    if(!user.getUserId().equals(board.getUserId())){
+      log.info("삭제하려는 유저와 게시글을 작성한 유저가 일치하지 않습니다.");
+      return false;
+    }
+
+    log.info("게시글" + board.getBoardId() + "글이 삭제 되었습니다.");
+    boardRepository.deleteById(boardDeleteInput.getBoardId());
+    return true;
   }
 
   //등록된 파일 저장
@@ -155,8 +181,6 @@ public class BoardServiceImpl implements BoardService {
     }
     return new String[]{newFilename, newUrlFilename};
   }
-
-
 
 
 }
