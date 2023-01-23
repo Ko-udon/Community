@@ -50,7 +50,10 @@ API 테스트 페이지 - 서버 실행 후 [swagger페이지](http://localhost:
 ![image](https://user-images.githubusercontent.com/79897135/214005777-b91da5ba-b916-4778-b1aa-df8b9ddd7309.png)
 
 
+실행 결과
+![image](https://user-images.githubusercontent.com/79897135/214006052-95a85ee0-23ac-4ee0-9dac-4fb968d6b8b9.png)
 
+* 회원탈퇴
 
 
 
