@@ -37,8 +37,4 @@ file:
   upload:
     location: D:/IntelliJ/JavaWorkspace/Community/src/main/java/community/project/community/Img
 uploadFoloder: upload
-#mybatis:
-#  mapper-locations: mybatis/**/*.xml
-#  configuration:
-#    map-underscore-to-camel-case: true
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

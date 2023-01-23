@@ -1,11 +1,10 @@
 package community.project.community.Board.entity;
 
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import java.util.List;
+import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,5 +33,19 @@ public class Board {
 
   String filename;
   String urlFilename;
+
+  //Cannot call sendError() after the response has been committed 오류 처리
+  //@JsonIgnore
+  @JsonIgnore
+  @OneToMany(mappedBy = "board",fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
+  private List<BoardComment> boardCommentList;
+
+  @ElementCollection
+  private List<String> likeList;
+
+  @ElementCollection
+  @CollectionTable(name = "hateList")
+  private List<String> hateList;
+
 
 }

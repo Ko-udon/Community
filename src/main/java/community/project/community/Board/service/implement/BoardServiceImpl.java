@@ -5,6 +5,7 @@ import community.project.community.Board.exception.BoardModifyNotMatchUserExcept
 import community.project.community.Board.exception.BoardNotFoundException;
 import community.project.community.Board.model.BoardDeleteInput;
 import community.project.community.Board.model.BoardInput;
+import community.project.community.Board.model.BoardLikeHateInput;
 import community.project.community.Board.model.BoardModifyInput;
 import community.project.community.Board.repository.BoardRepository;
 import community.project.community.Board.service.BoardService;
@@ -19,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
@@ -31,6 +31,7 @@ public class BoardServiceImpl implements BoardService {
   private final UserRepository userRepository;
 
   private final BoardRepository boardRepository;
+
 
   @Override
   public Board addBoard(BoardInput boardInput) {
@@ -141,6 +142,38 @@ public class BoardServiceImpl implements BoardService {
 
     log.info("게시글" + board.getBoardId() + "글이 삭제 되었습니다.");
     boardRepository.deleteById(boardDeleteInput.getBoardId());
+    return true;
+  }
+
+  //좋아요, 싫어요 등록
+  @Override
+  public boolean addLikeHate(long boardId, BoardLikeHateInput boardLikeHateInput) {
+
+    Board board = boardRepository.findByBoardId(boardId)
+            .orElseThrow(() -> new BoardNotFoundException("해당 게시글이 존재하지 않습니다."));
+
+    User user = userRepository.findByUserId(boardLikeHateInput.getUserId())
+            .orElseThrow(() -> new UserNotFoundException("유저 정보가 존재하지 않습니다."));
+
+    /*BoardLikeHate boardLikeHate = BoardLikeHate.builder()
+            .userId(boardLikeHateInput.getUserId())
+            .value(boardLikeHateInput.getValue())
+            .board(board)
+            .build();
+
+    boardLikeHateRepository.save(boardLikeHate);*/
+
+    if(boardLikeHateInput.getValue().equals("LIKE")){
+      board.getLikeList().add(user.getUserId());
+      board.setLikes(board.getLikes()+1);
+    }else{
+      board.getHateList().add(user.getUserId());
+      board.setHates(board.getHates()+1);
+    }
+
+    boardRepository.save(board);
+
+
     return true;
   }
 
