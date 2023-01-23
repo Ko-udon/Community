@@ -2,7 +2,6 @@ package community.project.community.Board.controller;
 
 import community.project.community.Board.entity.Board;
 import community.project.community.Board.entity.BoardComment;
-import community.project.community.Board.entity.BoardLikeHate;
 import community.project.community.Board.exception.BoardNotFoundException;
 import community.project.community.Board.model.*;
 import community.project.community.Board.repository.BoardCommentRepository;
@@ -12,7 +11,6 @@ import community.project.community.Board.service.BoardService;
 import io.swagger.annotations.ApiOperation;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +75,7 @@ public class BoardRestController {
         Board board = boardService.addBoard(boardInput);
 
         return ResponseEntity.ok()
-                .body("게시글이 정상적으로 업로드 되었습니다. 게시글의 등록번호는" + board.getBoardId() + "입니다.");
+                .body("게시글이 정상적으로 업로드 되었습니다. 게시글의 등록번호는" + board.getBoardId() + "번 입니다.");
     }
 
     //게시판 글 삭제
