@@ -3,6 +3,9 @@
 
 API 테스트 페이지 - 서버 실행 후 [swagger페이지](http://localhost:8080/swagger-ui/index.html#)
 
+## 기술 스택
+<img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+
 ## 기능 정의
 
 ### 사용자(user-rest-controller)
