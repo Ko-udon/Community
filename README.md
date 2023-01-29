@@ -13,11 +13,11 @@ API 테스트 페이지 - 서버 실행 후 [swagger페이지](http://localhost:
 
 ## **프로젝트 구조**
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5fca4247-af53-4fce-82b0-739c888955eb/Untitled.png)
+![image](https://user-images.githubusercontent.com/79897135/215305624-72b42d78-0551-49c7-843c-e9e08853072b.png)
 
 ## ERD
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9f3c8a0d-d85e-4f84-a318-18f76100d062/Untitled.png)
+![image](https://user-images.githubusercontent.com/79897135/215305618-62647ed1-e612-4628-90f0-c2321e22be68.png)
 
 해당 내용대로 진행, 추가로 필요한 데이터가 있을시에 추가
 
